@@ -1,0 +1,25 @@
+# 1. Vérifier que l'API est fonctionnelle
+curl -X GET http://localhost:8000/verify
+
+# 2. Générer un QCM (alice:wonderland en Base64 = YWxpY2U6d29uZGVybGFuZA==)
+curl -X POST http://localhost:8000/generate_quiz \
+  -H "Authorization: Basic YWxpY2U6d29uZGVybGFuZA==" \
+  -H "Content-Type: application/json" \
+  -d "{\"test_type\": \"Test de positionnement\", \"categories\": [\"BDD\"], \"number_of_questions\": 5}"
+
+# 3. Créer une nouvelle question (admin)
+curl -X POST http://localhost:8000/create_question \
+  -H "Content-Type: application/json" \
+  -d "{\"admin_username\": \"admin\", \"admin_password\": \"4dm1N\", \"question\": \"Quelle est la capitale de la France ?\", \"subject\": \"Data Science\", \"correct\": \"B\", \"use\": \"Test de positionnement\", \"responseA\": \"Londres\", \"responseB\": \"Paris\", \"responseC\": \"Berlin\"}"
+
+# 4. Test authentification incorrecte (doit renvoyer 401)
+curl -X POST http://localhost:8000/generate_quiz \
+  -H "Authorization: Basic bWF1dmFpczptZHA=" \
+  -H "Content-Type: application/json" \
+  -d "{\"test_type\": \"Test de positionnement\", \"categories\": [\"BDD\"], \"number_of_questions\": 5}"
+
+# 5. Test avec catégorie inexistante (doit renvoyer 404)
+curl -X POST http://localhost:8000/generate_quiz \
+  -H "Authorization: Basic YWxpY2U6d29uZGVybGFuZA==" \
+  -H "Content-Type: application/json" \
+  -d "{\"test_type\": \"Test de positionnement\", \"categories\": [\"Inexistant\"], \"number_of_questions\": 5}"
